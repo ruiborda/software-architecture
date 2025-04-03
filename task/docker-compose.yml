@@ -1,0 +1,74 @@
+name: project04
+services:
+  app:
+    image: ruiborda/software-architecture-04-spring-kafka-ecommerce
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: ${PROJECT04_SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${PROJECT04_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${PROJECT04_SPRING_DATASOURCE_PASSWORD}
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: ${PROJECT04_POSTGRES_DB}
+      POSTGRES_USER: ${PROJECT04_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PROJECT04_POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${PROJECT04_ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${PROJECT04_ZOOKEEPER_TICK_TIME}
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: ${PROJECT04_KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${PROJECT04_KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_LISTENERS: ${PROJECT04_KAFKA_LISTENERS}
+      KAFKA_ADVERTISED_LISTENERS: ${PROJECT04_KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${PROJECT04_KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${PROJECT04_KAFKA_INTER_BROKER_LISTENER_NAME}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${PROJECT04_KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${PROJECT04_KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${PROJECT04_KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: ${PROJECT04_KAFKA_AUTO_CREATE_TOPICS_ENABLE}
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: ${PROJECT04_KAFKA_CLUSTERS_0_NAME}
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${PROJECT04_KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      KAFKA_CLUSTERS_0_ZOOKEEPER: ${PROJECT04_KAFKA_CLUSTERS_0_ZOOKEEPER}
+    depends_on:
+      - kafka
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
