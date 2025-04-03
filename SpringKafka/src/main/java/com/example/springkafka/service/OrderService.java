@@ -89,8 +89,9 @@ public class OrderService {
         log.info("Order created successfully with ID: {}", orderSaved.getId());
 
         // 5. Publicar en Kafka
-        kafkaGenerateReceiptProducerService.publish(OrderMapper.toDto(orderSaved));
-        kafkaSendOrderProducerService.publish(OrderMapper.toDto(orderSaved));
+        OrderDTO orderDto = OrderMapper.toDto(orderSaved);
+        kafkaGenerateReceiptProducerService.publish(orderDto);
+        kafkaSendOrderProducerService.publish(orderDto);
         return orderSaved;
     }
 

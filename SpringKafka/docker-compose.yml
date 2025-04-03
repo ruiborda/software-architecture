@@ -1,4 +1,4 @@
-name: spring
+name: project04
 services:
   app:
     build: .
