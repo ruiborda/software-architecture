@@ -11,6 +11,11 @@ services:
       SPRING_DATASOURCE_URL: ${PROJECT04_SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${PROJECT04_SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${PROJECT04_SPRING_DATASOURCE_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
   db:
     image: postgres:16
@@ -21,6 +26,11 @@ services:
       POSTGRES_PASSWORD: ${PROJECT04_POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -32,6 +42,11 @@ services:
       - "2181:2181"
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
@@ -54,6 +69,11 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: ${PROJECT04_KAFKA_AUTO_CREATE_TOPICS_ENABLE}
     volumes:
       - kafka_data:/var/lib/kafka/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -66,6 +86,11 @@ services:
       KAFKA_CLUSTERS_0_ZOOKEEPER: ${PROJECT04_KAFKA_CLUSTERS_0_ZOOKEEPER}
     depends_on:
       - kafka
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
 volumes:
   zookeeper_data:
