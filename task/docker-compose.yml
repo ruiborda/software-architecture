@@ -14,8 +14,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.5"
+          memory: 1000M
 
   db:
     image: postgres:16
@@ -29,8 +29,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.5"
+          memory: 1000M
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -45,8 +45,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.5"
+          memory: 1000M
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
@@ -72,8 +72,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.5"
+          memory: 1000M
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -89,8 +89,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.5"
+          memory: 1000M
 
 volumes:
   zookeeper_data:
