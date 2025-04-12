@@ -1,0 +1,990 @@
+=== ./README.md ===
+# LICENCIAS DE FUNCIONAMIENTO MPS 12k
+
+https://datosabiertos.gob.pe/dataset/licencias-de-funcionamiento-mps
+
+=== ./pom.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId>licenses</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>licenses</name>
+    <description>licenses</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <java.version>21</java.version>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin de Spring Boot (sin cambios) -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin del Compilador de Maven (CONSOLIDADO Y CORREGIDO) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <!-- La versión se hereda del parent POM (Spring Boot), usualmente es la adecuada -->
+                <configuration>
+                    <!-- Asegúrate que use la versión Java correcta definida en properties -->
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <!-- Procesador de Lombok -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <!-- La versión se hereda de <dependencies> -->
+                            <!-- <version>${lombok.version}</version> --> <!-- Descomentar y definir ${lombok.version} en properties si no se hereda -->
+                        </path>
+                        <!-- Procesador de MapStruct -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <!-- Opcional pero recomendado: Binding para que Lombok se ejecute antes que MapStruct -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <!-- Asegúrate que la versión sea compatible. Usualmente 0.2.0 es segura -->
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <!-- Opcional: Necesario en algunas configuraciones para que los argumentos del constructor se nombren correctamente -->
+                    <compilerArgs>
+                        <compilerArg>
+                            -Amapstruct.defaultComponentModel=spring
+                        </compilerArg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+
+=== ./docker-compose.yml ===
+name: licenses
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: licenses
+    ports:
+      - "5432:5432"
+    volumes:
+      - licenses_data:/var/lib/postgresql/data
+
+volumes:
+  licenses_data:
+
+
+=== ./.mvn/wrapper/maven-wrapper.properties ===
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+wrapperVersion=3.3.2
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.9/apache-maven-3.9.9-bin.zip
+
+
+=== ./src/main/java/com/example/licenses/LicensesApplication.java ===
+package com.example.licenses;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class LicensesApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LicensesApplication.class, args);
+    }
+
+}
+
+
+=== ./src/main/java/com/example/licenses/model/MpsOperatingLicense.java ===
+package com.example.licenses.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Entity
+@Table(name = "mps_operating_license")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
+public class MpsOperatingLicense {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "departamento", length = 100)
+    private String department;
+
+    @Column(name = "provincia", length = 100)
+    private String province;
+
+    @Column(name = "distrito", length = 100)
+    private String district;
+
+    @Column(name = "ubigeo", length = 20)
+    private String ubigeo;
+
+    @Column(name = "fecha_corte")
+    private String cutoffDate;
+
+    @Column(name = "cod_licencia")
+    private Integer licenseCode;
+
+    @Column(name = "num_licencia", length = 20)
+    private String licenseNumber;
+
+    @Column(name = "f_licencia")
+    private Long fLicense;
+
+    @Column(name = "num_contribuyente", length = 20)
+    private String taxpayerNumber;
+
+    @Column(name = "area", precision = 10, scale = 2)
+    private Long area;
+
+    @Column(name = "giro", columnDefinition = "text")
+    private String businessActivity;
+
+    @Column(name = "estado", length = 20)
+    private String status;
+
+    @Column(name = "monto", precision = 10, scale = 2)
+    private BigDecimal amount;
+}
+
+
+=== ./src/main/java/com/example/licenses/repository/MpsOperatingLicenseRepository.java ===
+package com.example.licenses.repository;
+
+import com.example.licenses.model.MpsOperatingLicense;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface MpsOperatingLicenseRepository extends JpaRepository<MpsOperatingLicense, UUID>, JpaSpecificationExecutor<MpsOperatingLicense> {
+    List<MpsOperatingLicense> findByDepartment(String department);
+    List<MpsOperatingLicense> findByProvince(String province);
+    List<MpsOperatingLicense> findByDistrict(String district);
+} 
+
+=== ./src/main/java/com/example/licenses/dto/MpsOperatingLicenseRequestDTO.java ===
+package com.example.licenses.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MpsOperatingLicenseRequestDTO {
+    private String department;
+    private String province;
+    private String district;
+    private String ubigeo;
+    private String cutoffDate;
+    private Integer licenseCode;
+    private String licenseNumber;
+    private Long fLicense;
+    private String taxpayerNumber;
+    private Long area;
+    private String businessActivity;
+    private String status;
+    private BigDecimal amount;
+} 
+
+=== ./src/main/java/com/example/licenses/dto/MpsOperatingLicenseResponseDTO.java ===
+package com.example.licenses.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MpsOperatingLicenseResponseDTO {
+    private UUID id;
+    private String department;
+    private String province;
+    private String district;
+    private String ubigeo;
+    private String cutoffDate;
+    private Integer licenseCode;
+    private String licenseNumber;
+    private Long fLicense;
+    private String taxpayerNumber;
+    private Long area;
+    private String businessActivity;
+    private String status;
+    private BigDecimal amount;
+} 
+
+=== ./src/main/java/com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO.java ===
+package com.example.licenses.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GetMpsOperatingLicenseRequestDTO {
+    private String department;
+    private String province;
+    private String district;
+} 
+
+=== ./src/main/java/com/example/licenses/mapper/MpsOperatingLicenseMapper.java ===
+package com.example.licenses.mapper;
+
+import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
+import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.model.MpsOperatingLicense;
+import org.mapstruct.Mapper;
+// Elimina esta importación si quitas la línea INSTANCE
+// import org.mapstruct.factory.Mappers;
+// No es necesario importarlo, pero asegúrate de que no haya @Component aquí
+// import org.springframework.stereotype.Component;
+
+// Añade componentModel = "spring"
+@Mapper(componentModel = "spring")
+public interface MpsOperatingLicenseMapper {
+
+    // Elimina esta línea, ya no es necesaria con la inyección de Spring
+    // MpsOperatingLicenseMapper INSTANCE = Mappers.getMapper(MpsOperatingLicenseMapper.class);
+
+    MpsOperatingLicense toEntity(MpsOperatingLicenseRequestDTO dto);
+
+    MpsOperatingLicenseResponseDTO toResponseDTO(MpsOperatingLicense entity);
+}
+
+=== ./src/main/java/com/example/licenses/service/MpsOperatingLicenseService.java ===
+package com.example.licenses.service;
+
+import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
+import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.mapper.MpsOperatingLicenseMapper;
+import com.example.licenses.model.MpsOperatingLicense;
+import com.example.licenses.repository.MpsOperatingLicenseRepository;
+// import lombok.AllArgsConstructor; // Elimina esta línea
+import lombok.RequiredArgsConstructor; // Añade esta línea
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+// @AllArgsConstructor // Reemplaza esta línea
+@RequiredArgsConstructor // Con esta línea
+public class MpsOperatingLicenseService {
+
+    // Estos campos final ahora serán inicializados por el constructor generado por @RequiredArgsConstructor
+    final private MpsOperatingLicenseRepository repository;
+    final private MpsOperatingLicenseMapper mapper;
+
+    public MpsOperatingLicenseResponseDTO createLicense(MpsOperatingLicenseRequestDTO requestDTO) {
+        MpsOperatingLicense license = mapper.toEntity(requestDTO);
+        MpsOperatingLicense savedLicense = repository.save(license);
+        return mapper.toResponseDTO(savedLicense);
+    }
+
+    public List<MpsOperatingLicenseResponseDTO> getLicensesByDepartment(String department) {
+        return repository.findByDepartment(department)
+                .stream()
+                .map(mapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MpsOperatingLicenseResponseDTO> getLicensesByProvince(String province) {
+        return repository.findByProvince(province)
+                .stream()
+                .map(mapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MpsOperatingLicenseResponseDTO> getLicensesByDistrict(String district) {
+        return repository.findByDistrict(district)
+                .stream()
+                .map(mapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+}
+
+=== ./src/main/java/com/example/licenses/controller/MpsOperatingLicenseController.java ===
+package com.example.licenses.controller;
+
+import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
+import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.service.MpsOperatingLicenseService;
+import lombok.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/licenses")
+public class MpsOperatingLicenseController {
+
+    final private MpsOperatingLicenseService service;
+
+    public MpsOperatingLicenseController(MpsOperatingLicenseService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public ResponseEntity<MpsOperatingLicenseResponseDTO> createLicense(
+            @RequestBody MpsOperatingLicenseRequestDTO requestDTO) {
+        return ResponseEntity.ok(service.createLicense(requestDTO));
+    }
+
+    @GetMapping("/department/{department}")
+    public ResponseEntity<List<MpsOperatingLicenseResponseDTO>> getLicensesByDepartment(
+            @PathVariable String department) {
+        return ResponseEntity.ok(service.getLicensesByDepartment(department));
+    }
+
+    @GetMapping("/province/{province}")
+    public ResponseEntity<List<MpsOperatingLicenseResponseDTO>> getLicensesByProvince(
+            @PathVariable String province) {
+        return ResponseEntity.ok(service.getLicensesByProvince(province));
+    }
+
+    @GetMapping("/district/{district}")
+    public ResponseEntity<List<MpsOperatingLicenseResponseDTO>> getLicensesByDistrict(
+            @PathVariable String district) {
+        return ResponseEntity.ok(service.getLicensesByDistrict(district));
+    }
+} 
+
+=== ./src/main/resources/application.properties ===
+spring.application.name=licenses
+
+spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/licenses
+spring.datasource.username=user
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.datasource.hikari.connection-timeout=30000
+
+=== ./src/test/java/com/example/licenses/LicensesApplicationTests.java ===
+package com.example.licenses;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class LicensesApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
+
+
+=== ./.idea/workspace.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="463654f5-20e6-40a7-9e18-980a52a7a6bc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/prompt_generator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/licenses/model/MpsOperatingLicense.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ruiborda&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ruiborda/software-architecture.git&quot;,
+    &quot;accountId&quot;: &quot;19006ead-8f5a-4ec8-9294-7e04ab800c12&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2vWIu4w3mSXVzOjcNgn7opoqDmh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.LicensesApplication.executor": "Run",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/rui/GitHub/software-architecture/licenses",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="LicensesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="licenses" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.licenses.LicensesApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.26053.27" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.26053.27" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="463654f5-20e6-40a7-9e18-980a52a7a6bc" name="Changes" comment="" />
+      <created>1744254622576</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1744254622576</updated>
+      <workItem from="1744254623842" duration="3822000" />
+      <workItem from="1744258715009" duration="816000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
+
+=== ./.idea/compiler.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for licenses" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
+        </processorPath>
+        <module name="licenses" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="licenses" options="-parameters" />
+    </option>
+  </component>
+</project>
+
+=== ./.idea/misc.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK" />
+</project>
+
+=== ./.idea/encodings.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+  </component>
+</project>
+
+=== ./.idea/jarRepositories.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+  </component>
+</project>
+
+=== ./.idea/vcs.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+  </component>
+</project>
+
+=== ./target/licenses-0.0.1-SNAPSHOT.jar.original ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xbc in position 11: invalid start byte]
+
+=== ./target/licenses-0.0.1-SNAPSHOT.jar ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xbc in position 11: invalid start byte]
+
+=== ./target/classes/application.properties ===
+spring.application.name=licenses
+
+spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/licenses
+spring.datasource.username=user
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.datasource.hikari.connection-timeout=30000
+
+=== ./target/classes/com/example/licenses/LicensesApplication.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/controller/MpsOperatingLicenseController.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/service/MpsOperatingLicenseService.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/MpsOperatingLicenseRequestDTO$MpsOperatingLicenseRequestDTOBuilder.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/MpsOperatingLicenseRequestDTO.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/MpsOperatingLicenseResponseDTO$MpsOperatingLicenseResponseDTOBuilder.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/MpsOperatingLicenseResponseDTO.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO$GetMpsOperatingLicenseRequestDTOBuilder.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/repository/MpsOperatingLicenseRepository.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/model/MpsOperatingLicense$MpsOperatingLicenseBuilder.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/model/MpsOperatingLicense.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/mapper/MpsOperatingLicenseMapper.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/classes/com/example/licenses/mapper/MpsOperatingLicenseMapperImpl.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/generated-sources/annotations/com/example/licenses/mapper/MpsOperatingLicenseMapperImpl.java ===
+package com.example.licenses.mapper;
+
+import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
+import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.model.MpsOperatingLicense;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2025-04-09T23:32:31-0500",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.6 (Oracle Corporation)"
+)
+@Component
+public class MpsOperatingLicenseMapperImpl implements MpsOperatingLicenseMapper {
+
+    @Override
+    public MpsOperatingLicense toEntity(MpsOperatingLicenseRequestDTO dto) {
+        if ( dto == null ) {
+            return null;
+        }
+
+        MpsOperatingLicense.MpsOperatingLicenseBuilder mpsOperatingLicense = MpsOperatingLicense.builder();
+
+        mpsOperatingLicense.department( dto.getDepartment() );
+        mpsOperatingLicense.province( dto.getProvince() );
+        mpsOperatingLicense.district( dto.getDistrict() );
+        mpsOperatingLicense.ubigeo( dto.getUbigeo() );
+        mpsOperatingLicense.cutoffDate( dto.getCutoffDate() );
+        mpsOperatingLicense.licenseCode( dto.getLicenseCode() );
+        mpsOperatingLicense.licenseNumber( dto.getLicenseNumber() );
+        mpsOperatingLicense.taxpayerNumber( dto.getTaxpayerNumber() );
+        mpsOperatingLicense.area( dto.getArea() );
+        mpsOperatingLicense.businessActivity( dto.getBusinessActivity() );
+        mpsOperatingLicense.status( dto.getStatus() );
+        mpsOperatingLicense.amount( dto.getAmount() );
+
+        return mpsOperatingLicense.build();
+    }
+
+    @Override
+    public MpsOperatingLicenseResponseDTO toResponseDTO(MpsOperatingLicense entity) {
+        if ( entity == null ) {
+            return null;
+        }
+
+        MpsOperatingLicenseResponseDTO.MpsOperatingLicenseResponseDTOBuilder mpsOperatingLicenseResponseDTO = MpsOperatingLicenseResponseDTO.builder();
+
+        mpsOperatingLicenseResponseDTO.id( entity.getId() );
+        mpsOperatingLicenseResponseDTO.department( entity.getDepartment() );
+        mpsOperatingLicenseResponseDTO.province( entity.getProvince() );
+        mpsOperatingLicenseResponseDTO.district( entity.getDistrict() );
+        mpsOperatingLicenseResponseDTO.ubigeo( entity.getUbigeo() );
+        mpsOperatingLicenseResponseDTO.cutoffDate( entity.getCutoffDate() );
+        mpsOperatingLicenseResponseDTO.licenseCode( entity.getLicenseCode() );
+        mpsOperatingLicenseResponseDTO.licenseNumber( entity.getLicenseNumber() );
+        mpsOperatingLicenseResponseDTO.taxpayerNumber( entity.getTaxpayerNumber() );
+        mpsOperatingLicenseResponseDTO.area( entity.getArea() );
+        mpsOperatingLicenseResponseDTO.businessActivity( entity.getBusinessActivity() );
+        mpsOperatingLicenseResponseDTO.status( entity.getStatus() );
+        mpsOperatingLicenseResponseDTO.amount( entity.getAmount() );
+
+        return mpsOperatingLicenseResponseDTO.build();
+    }
+}
+
+
+=== ./target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst ===
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/LicensesApplication.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/controller/MpsOperatingLicenseController.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/dto/MpsOperatingLicenseRequestDTO.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/dto/MpsOperatingLicenseResponseDTO.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/mapper/MpsOperatingLicenseMapper.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/model/MpsOperatingLicense.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/repository/MpsOperatingLicenseRepository.java
+/home/rui/GitHub/software-architecture/licenses/src/main/java/com/example/licenses/service/MpsOperatingLicenseService.java
+
+
+=== ./target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst ===
+com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO.class
+com/example/licenses/model/MpsOperatingLicense.class
+com/example/licenses/controller/MpsOperatingLicenseController.class
+com/example/licenses/dto/MpsOperatingLicenseResponseDTO.class
+com/example/licenses/mapper/MpsOperatingLicenseMapperImpl.class
+com/example/licenses/service/MpsOperatingLicenseService.class
+com/example/licenses/dto/MpsOperatingLicenseRequestDTO.class
+com/example/licenses/LicensesApplication.class
+com/example/licenses/dto/MpsOperatingLicenseRequestDTO$MpsOperatingLicenseRequestDTOBuilder.class
+com/example/licenses/repository/MpsOperatingLicenseRepository.class
+com/example/licenses/mapper/MpsOperatingLicenseMapper.class
+com/example/licenses/model/MpsOperatingLicense$MpsOperatingLicenseBuilder.class
+com/example/licenses/dto/GetMpsOperatingLicenseRequestDTO$GetMpsOperatingLicenseRequestDTOBuilder.class
+com/example/licenses/dto/MpsOperatingLicenseResponseDTO$MpsOperatingLicenseResponseDTOBuilder.class
+
+
+=== ./target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst ===
+/home/rui/GitHub/software-architecture/licenses/src/test/java/com/example/licenses/LicensesApplicationTests.java
+
+
+=== ./target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst ===
+com/example/licenses/LicensesApplicationTests.class
+
+
+=== ./target/test-classes/com/example/licenses/LicensesApplicationTests.class ===
+[Error al leer el archivo: 'utf-8' codec can't decode byte 0xca in position 0: invalid continuation byte]
+
+=== ./target/surefire-reports/com.example.licenses.LicensesApplicationTests.txt ===
+-------------------------------------------------------------------------------
+Test set: com.example.licenses.LicensesApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.556 s -- in com.example.licenses.LicensesApplicationTests
+
+
+=== ./target/surefire-reports/TEST-com.example.licenses.LicensesApplicationTests.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.example.licenses.LicensesApplicationTests" time="4.556" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/rui/GitHub/software-architecture/licenses/target/test-classes:/home/rui/GitHub/software-architecture/licenses/target/classes:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.4.4/spring-boot-starter-data-jpa-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter/3.4.4/spring-boot-starter-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot/3.4.4/spring-boot-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.4.4/spring-boot-autoconfigure-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.4.4/spring-boot-starter-logging-3.4.4.jar:/home/rui/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/home/rui/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/home/rui/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.24.3/log4j-to-slf4j-2.24.3.jar:/home/rui/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar:/home/rui/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/home/rui/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/rui/.m2/repository/org/yaml/snakeyaml/2.3/snakeyaml-2.3.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.4.4/spring-boot-starter-jdbc-3.4.4.jar:/home/rui/.m2/repository/com/zaxxer/HikariCP/5.1.0/HikariCP-5.1.0.jar:/home/rui/.m2/repository/org/springframework/spring-jdbc/6.2.5/spring-jdbc-6.2.5.jar:/home/rui/.m2/repository/org/hibernate/orm/hibernate-core/6.6.11.Final/hibernate-core-6.6.11.Final.jar:/home/rui/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/rui/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/rui/.m2/repository/org/jboss/logging/jboss-logging/3.6.1.Final/jboss-logging-3.6.1.Final.jar:/home/rui/.m2/repository/org/hibernate/common/hibernate-commons-annotations/7.0.3.Final/hibernate-commons-annotations-7.0.3.Final.jar:/home/rui/.m2/repository/io/smallrye/jandex/3.2.0/jandex-3.2.0.jar:/home/rui/.m2/repository/com/fasterxml/classmate/1.7.0/classmate-1.7.0.jar:/home/rui/.m2/repository/net/bytebuddy/byte-buddy/1.15.11/byte-buddy-1.15.11.jar:/home/rui/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/home/rui/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/home/rui/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/home/rui/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/home/rui/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/rui/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/rui/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/rui/.m2/repository/org/springframework/data/spring-data-jpa/3.4.4/spring-data-jpa-3.4.4.jar:/home/rui/.m2/repository/org/springframework/data/spring-data-commons/3.4.4/spring-data-commons-3.4.4.jar:/home/rui/.m2/repository/org/springframework/spring-orm/6.2.5/spring-orm-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-context/6.2.5/spring-context-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-aop/6.2.5/spring-aop-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-tx/6.2.5/spring-tx-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-beans/6.2.5/spring-beans-6.2.5.jar:/home/rui/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/rui/.m2/repository/org/springframework/spring-aspects/6.2.5/spring-aspects-6.2.5.jar:/home/rui/.m2/repository/org/aspectj/aspectjweaver/1.9.23/aspectjweaver-1.9.23.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.4.4/spring-boot-starter-validation-3.4.4.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.39/tomcat-embed-el-10.1.39.jar:/home/rui/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.2.Final/hibernate-validator-8.0.2.Final.jar:/home/rui/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.4.4/spring-boot-starter-web-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.4.4/spring-boot-starter-json-3.4.4.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.3/jackson-databind-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.3/jackson-annotations-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.3/jackson-core-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.3/jackson-datatype-jdk8-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.3/jackson-datatype-jsr310-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.18.3/jackson-module-parameter-names-2.18.3.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.4.4/spring-boot-starter-tomcat-3.4.4.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.39/tomcat-embed-core-10.1.39.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.39/tomcat-embed-websocket-10.1.39.jar:/home/rui/.m2/repository/org/springframework/spring-web/6.2.5/spring-web-6.2.5.jar:/home/rui/.m2/repository/io/micrometer/micrometer-observation/1.14.5/micrometer-observation-1.14.5.jar:/home/rui/.m2/repository/io/micrometer/micrometer-commons/1.14.5/micrometer-commons-1.14.5.jar:/home/rui/.m2/repository/org/springframework/spring-webmvc/6.2.5/spring-webmvc-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-expression/6.2.5/spring-expression-6.2.5.jar:/home/rui/.m2/repository/org/postgresql/postgresql/42.7.5/postgresql-42.7.5.jar:/home/rui/.m2/repository/org/checkerframework/checker-qual/3.48.3/checker-qual-3.48.3.jar:/home/rui/.m2/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.4.4/spring-boot-starter-test-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-test/3.4.4/spring-boot-test-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.4.4/spring-boot-test-autoconfigure-3.4.4.jar:/home/rui/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/rui/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/rui/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/rui/.m2/repository/net/minidev/json-smart/2.5.2/json-smart-2.5.2.jar:/home/rui/.m2/repository/net/minidev/accessors-smart/2.5.2/accessors-smart-2.5.2.jar:/home/rui/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar:/home/rui/.m2/repository/org/assertj/assertj-core/3.26.3/assertj-core-3.26.3.jar:/home/rui/.m2/repository/org/awaitility/awaitility/4.2.2/awaitility-4.2.2.jar:/home/rui/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.jar:/home/rui/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/rui/.m2/repository/org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.jar:/home/rui/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.jar:/home/rui/.m2/repository/org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.jar:/home/rui/.m2/repository/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar:/home/rui/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar:/home/rui/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/rui/.m2/repository/org/mockito/mockito-junit-jupiter/5.14.2/mockito-junit-jupiter-5.14.2.jar:/home/rui/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar:/home/rui/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/rui/.m2/repository/org/springframework/spring-core/6.2.5/spring-core-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-jcl/6.2.5/spring-jcl-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-test/6.2.5/spring-test-6.2.5.jar:/home/rui/.m2/repository/org/xmlunit/xmlunit-core/2.10.0/xmlunit-core-2.10.0.jar:/home/rui/.m2/repository/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar:"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="America/Lima"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="APPLICATION_NAME" value="licenses"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="PE"/>
+    <property name="sun.boot.library.path" value="/home/rui/.sdkman/candidates/java/21.0.6-oracle/lib"/>
+    <property name="sun.java.command" value="/home/rui/GitHub/software-architecture/licenses/target/surefire/surefirebooter-20250409233234658_3.jar /home/rui/GitHub/software-architecture/licenses/target/surefire 2025-04-09T23-32-34_280-jvmRun1 surefire-20250409233234658_1tmp surefire_0-20250409233234658_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/rui/GitHub/software-architecture/licenses/target/test-classes:/home/rui/GitHub/software-architecture/licenses/target/classes:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.4.4/spring-boot-starter-data-jpa-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter/3.4.4/spring-boot-starter-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot/3.4.4/spring-boot-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.4.4/spring-boot-autoconfigure-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.4.4/spring-boot-starter-logging-3.4.4.jar:/home/rui/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/home/rui/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/home/rui/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.24.3/log4j-to-slf4j-2.24.3.jar:/home/rui/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar:/home/rui/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/home/rui/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/rui/.m2/repository/org/yaml/snakeyaml/2.3/snakeyaml-2.3.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.4.4/spring-boot-starter-jdbc-3.4.4.jar:/home/rui/.m2/repository/com/zaxxer/HikariCP/5.1.0/HikariCP-5.1.0.jar:/home/rui/.m2/repository/org/springframework/spring-jdbc/6.2.5/spring-jdbc-6.2.5.jar:/home/rui/.m2/repository/org/hibernate/orm/hibernate-core/6.6.11.Final/hibernate-core-6.6.11.Final.jar:/home/rui/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/rui/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/rui/.m2/repository/org/jboss/logging/jboss-logging/3.6.1.Final/jboss-logging-3.6.1.Final.jar:/home/rui/.m2/repository/org/hibernate/common/hibernate-commons-annotations/7.0.3.Final/hibernate-commons-annotations-7.0.3.Final.jar:/home/rui/.m2/repository/io/smallrye/jandex/3.2.0/jandex-3.2.0.jar:/home/rui/.m2/repository/com/fasterxml/classmate/1.7.0/classmate-1.7.0.jar:/home/rui/.m2/repository/net/bytebuddy/byte-buddy/1.15.11/byte-buddy-1.15.11.jar:/home/rui/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/home/rui/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/home/rui/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/home/rui/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/home/rui/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/rui/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/rui/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/rui/.m2/repository/org/springframework/data/spring-data-jpa/3.4.4/spring-data-jpa-3.4.4.jar:/home/rui/.m2/repository/org/springframework/data/spring-data-commons/3.4.4/spring-data-commons-3.4.4.jar:/home/rui/.m2/repository/org/springframework/spring-orm/6.2.5/spring-orm-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-context/6.2.5/spring-context-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-aop/6.2.5/spring-aop-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-tx/6.2.5/spring-tx-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-beans/6.2.5/spring-beans-6.2.5.jar:/home/rui/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/rui/.m2/repository/org/springframework/spring-aspects/6.2.5/spring-aspects-6.2.5.jar:/home/rui/.m2/repository/org/aspectj/aspectjweaver/1.9.23/aspectjweaver-1.9.23.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.4.4/spring-boot-starter-validation-3.4.4.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.39/tomcat-embed-el-10.1.39.jar:/home/rui/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.2.Final/hibernate-validator-8.0.2.Final.jar:/home/rui/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.4.4/spring-boot-starter-web-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.4.4/spring-boot-starter-json-3.4.4.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.3/jackson-databind-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.3/jackson-annotations-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.3/jackson-core-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.3/jackson-datatype-jdk8-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.3/jackson-datatype-jsr310-2.18.3.jar:/home/rui/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.18.3/jackson-module-parameter-names-2.18.3.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.4.4/spring-boot-starter-tomcat-3.4.4.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.39/tomcat-embed-core-10.1.39.jar:/home/rui/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.39/tomcat-embed-websocket-10.1.39.jar:/home/rui/.m2/repository/org/springframework/spring-web/6.2.5/spring-web-6.2.5.jar:/home/rui/.m2/repository/io/micrometer/micrometer-observation/1.14.5/micrometer-observation-1.14.5.jar:/home/rui/.m2/repository/io/micrometer/micrometer-commons/1.14.5/micrometer-commons-1.14.5.jar:/home/rui/.m2/repository/org/springframework/spring-webmvc/6.2.5/spring-webmvc-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-expression/6.2.5/spring-expression-6.2.5.jar:/home/rui/.m2/repository/org/postgresql/postgresql/42.7.5/postgresql-42.7.5.jar:/home/rui/.m2/repository/org/checkerframework/checker-qual/3.48.3/checker-qual-3.48.3.jar:/home/rui/.m2/repository/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.4.4/spring-boot-starter-test-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-test/3.4.4/spring-boot-test-3.4.4.jar:/home/rui/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.4.4/spring-boot-test-autoconfigure-3.4.4.jar:/home/rui/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/rui/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/rui/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/rui/.m2/repository/net/minidev/json-smart/2.5.2/json-smart-2.5.2.jar:/home/rui/.m2/repository/net/minidev/accessors-smart/2.5.2/accessors-smart-2.5.2.jar:/home/rui/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar:/home/rui/.m2/repository/org/assertj/assertj-core/3.26.3/assertj-core-3.26.3.jar:/home/rui/.m2/repository/org/awaitility/awaitility/4.2.2/awaitility-4.2.2.jar:/home/rui/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.jar:/home/rui/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/rui/.m2/repository/org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.jar:/home/rui/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.jar:/home/rui/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.jar:/home/rui/.m2/repository/org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.jar:/home/rui/.m2/repository/org/mockito/mockito-core/5.14.2/mockito-core-5.14.2.jar:/home/rui/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar:/home/rui/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/rui/.m2/repository/org/mockito/mockito-junit-jupiter/5.14.2/mockito-junit-jupiter-5.14.2.jar:/home/rui/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar:/home/rui/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/rui/.m2/repository/org/springframework/spring-core/6.2.5/spring-core-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-jcl/6.2.5/spring-jcl-6.2.5.jar:/home/rui/.m2/repository/org/springframework/spring-test/6.2.5/spring-test-6.2.5.jar:/home/rui/.m2/repository/org/xmlunit/xmlunit-core/2.10.0/xmlunit-core-2.10.0.jar:/home/rui/.m2/repository/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/rui"/>
+    <property name="user.language" value="es"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-01-21"/>
+    <property name="java.home" value="/home/rui/.sdkman/candidates/java/21.0.6-oracle"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/rui/GitHub/software-architecture/licenses"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/home/rui/GitHub/software-architecture/licenses/target/surefire/surefirebooter-20250409233234658_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.6+8-LTS-188"/>
+    <property name="user.name" value="rui"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.13.8-200.fc41.x86_64"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/rui/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="21.0.6"/>
+    <property name="user.dir" value="/home/rui/GitHub/software-architecture/licenses"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="25883"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="21.0.6+8-LTS-188"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[licenses] "/>
+  </properties>
+  <testcase name="contextLoads" classname="com.example.licenses.LicensesApplicationTests" time="0.508">
+    <system-out><![CDATA[23:32:35.482 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.licenses.LicensesApplicationTests]: LicensesApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:32:35.641 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.licenses.LicensesApplication for test class com.example.licenses.LicensesApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.4)
+
+2025-04-09T23:32:36.152-05:00  INFO 25883 --- [licenses] [           main] c.e.licenses.LicensesApplicationTests    : Starting LicensesApplicationTests using Java 21.0.6 with PID 25883 (started by rui in /home/rui/GitHub/software-architecture/licenses)
+2025-04-09T23:32:36.154-05:00  INFO 25883 --- [licenses] [           main] c.e.licenses.LicensesApplicationTests    : No active profile set, falling back to 1 default profile: "default"
+2025-04-09T23:32:36.758-05:00  INFO 25883 --- [licenses] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-09T23:32:36.817-05:00  INFO 25883 --- [licenses] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 50 ms. Found 1 JPA repository interface.
+2025-04-09T23:32:37.190-05:00  INFO 25883 --- [licenses] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-09T23:32:37.232-05:00  INFO 25883 --- [licenses] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.11.Final
+2025-04-09T23:32:37.260-05:00  INFO 25883 --- [licenses] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-09T23:32:37.508-05:00  INFO 25883 --- [licenses] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-09T23:32:37.534-05:00  INFO 25883 --- [licenses] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-09T23:32:37.701-05:00  INFO 25883 --- [licenses] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5458c71e
+2025-04-09T23:32:37.703-05:00  INFO 25883 --- [licenses] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-09T23:32:37.729-05:00  WARN 25883 --- [licenses] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-09T23:32:37.747-05:00  INFO 25883 --- [licenses] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.8
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-09T23:32:38.473-05:00  INFO 25883 --- [licenses] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-09T23:32:38.516-05:00  INFO 25883 --- [licenses] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-09T23:32:38.961-05:00  WARN 25883 --- [licenses] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-09T23:32:39.321-05:00  INFO 25883 --- [licenses] [           main] c.e.licenses.LicensesApplicationTests    : Started LicensesApplicationTests in 3.488 seconds (process running for 4.62)
+]]></system-out>
+    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/home/rui/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+</testsuite>
+
+=== ./target/maven-archiver/pom.properties ===
+artifactId=licenses
+groupId=com.example
+version=0.0.1-SNAPSHOT
+
+
