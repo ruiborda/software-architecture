@@ -3,6 +3,9 @@ package com.example.covid.controller;
 import com.example.covid.dto.*;
 import com.example.covid.service.PositivosCovidService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +45,22 @@ public class PositivosCovidController {
     public ResponseEntity<GetPositivosCovidBySexoResponseDTO> getBySexo(
             @PathVariable String sexo) {
         return ResponseEntity.ok(service.getBySexo(sexo));
+    }
+
+    @GetMapping("/pagination")
+    public ResponseEntity<GetPositivosCovidPaginationResponseDTO> getPagination(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+        
+        GetPositivosCovidPaginationRequestDTO request = GetPositivosCovidPaginationRequestDTO.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .sortDirection(sortDirection)
+                .build();
+                
+        return ResponseEntity.ok(service.getPagination(request));
     }
 } 

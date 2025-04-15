@@ -1,6 +1,8 @@
 package com.example.covid.repository;
 
 import com.example.covid.model.PositivosCovid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -13,4 +15,5 @@ public interface PositivosCovidRepository extends JpaRepository<PositivosCovid, 
     List<PositivosCovid> findByDepartamento(String departamento);
     List<PositivosCovid> findByEdadBetween(Integer edadMin, Integer edadMax);
     List<PositivosCovid> findBySexo(String sexo);
+    Page<PositivosCovid> findAll(Pageable pageable);
 } 

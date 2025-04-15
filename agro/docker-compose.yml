@@ -13,6 +13,24 @@ services:
       - agro_data:/var/lib/postgresql/data
       - ./data:/docker-entrypoint-initdb.d:ro
 
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP protocol port
+      - "15672:15672" # Management UI port
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   api:
     build:
       context: .
@@ -20,15 +38,28 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SERVER_PORT: 8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/database
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: true
-
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      APP_RABBITMQ_EXCHANGE: agro.notification.exchange
+      APP_RABBITMQ_QUEUE: agro.notification.queue
+      APP_RABBITMQ_ROUTINGKEY: agro.notification.routing.key
+      SPRINGDOC_SWAGGER_UI_PATH: /
+    restart: on-failure:3
 
 volumes:
   agro_data:
+  rabbitmq_data:

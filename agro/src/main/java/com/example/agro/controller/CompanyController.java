@@ -1,8 +1,6 @@
 package com.example.agro.controller;
 
-import com.example.agro.dto.CompanyRequestDTO;
-import com.example.agro.dto.CompanyResponseDTO;
-import com.example.agro.dto.GetCompanyByIdResponseDTO;
+import com.example.agro.dto.*;
 import com.example.agro.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,4 +40,21 @@ public class CompanyController {
     public ResponseEntity<List<CompanyResponseDTO>> getCompaniesBySize(@PathVariable String size) {
         return ResponseEntity.ok(companyService.getCompaniesBySize(size));
     }
-} 
+
+    @GetMapping("/pagination")
+    public ResponseEntity<GetCompanyPaginationResponseDTO> getPagination(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+        
+        GetCompanyPaginationRequestDTO requestDTO = GetCompanyPaginationRequestDTO.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .sortDirection(sortDirection)
+                .build();
+                
+        return ResponseEntity.ok(companyService.getPagination(requestDTO));
+    }
+}

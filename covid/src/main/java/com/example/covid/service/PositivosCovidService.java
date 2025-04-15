@@ -5,6 +5,9 @@ import com.example.covid.mapper.PositivosCovidMapper;
 import com.example.covid.model.PositivosCovid;
 import com.example.covid.repository.PositivosCovidRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,5 +51,15 @@ public class PositivosCovidService {
     public GetPositivosCovidBySexoResponseDTO getBySexo(String sexo) {
         List<PositivosCovid> casos = repository.findBySexo(sexo);
         return mapper.toGetBySexoResponseDTO(sexo, casos);
+    }
+
+    @Transactional(readOnly = true)
+    public GetPositivosCovidPaginationResponseDTO getPagination(GetPositivosCovidPaginationRequestDTO request) {
+        Sort.Direction direction = Sort.Direction.fromString(request.getSortDirection());
+        Sort sort = Sort.by(direction, request.getSortBy());
+        PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize(), sort);
+        
+        Page<PositivosCovid> page = repository.findAll(pageRequest);
+        return mapper.toPaginationResponseDTO(page);
     }
 } 

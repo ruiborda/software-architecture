@@ -1,12 +1,13 @@
 package com.example.agro.service;
 
-import com.example.agro.dto.CompanyRequestDTO;
-import com.example.agro.dto.CompanyResponseDTO;
-import com.example.agro.dto.GetCompanyByIdResponseDTO;
+import com.example.agro.dto.*;
 import com.example.agro.mapper.CompanyMapper;
 import com.example.agro.model.Company;
 import com.example.agro.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
+    private final VisitService visitService;
 
     @Transactional
     public CompanyResponseDTO createCompany(CompanyRequestDTO requestDTO) {
@@ -55,4 +57,17 @@ public class CompanyService {
                 .map(companyMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
-} 
+
+    @Transactional(readOnly = true)
+    public GetCompanyPaginationResponseDTO getPagination(GetCompanyPaginationRequestDTO request) {
+        // Track this pagination request using the VisitService
+        visitService.trackCompanyPagination();
+        
+        Sort.Direction direction = Sort.Direction.fromString(request.getSortDirection());
+        Sort sort = Sort.by(direction, request.getSortBy());
+        PageRequest pageRequest = PageRequest.of(request.getPage(), request.getSize(), sort);
+        
+        Page<Company> page = companyRepository.findAll(pageRequest);
+        return companyMapper.toPaginationResponseDTO(page);
+    }
+}

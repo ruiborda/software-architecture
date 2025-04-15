@@ -1,4 +1,4 @@
-name: licenses
+name: covid
 services:
   db:
     image: postgres:16
@@ -10,8 +10,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - covid_data:/var/lib/postgresql/data
-      - ./data:/docker-entrypoint-initdb.d:ro
+      - ./sqldata:/var/lib/postgresql/data
+#      - ./data:/docker-entrypoint-initdb.d:ro
 
   api:
     build:
@@ -28,7 +28,3 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: true
-
-
-volumes:
-  covid_data:
