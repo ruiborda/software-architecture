@@ -1,4 +1,4 @@
-name: licenses
+name: agro
 services:
   db:
     image: postgres:16
