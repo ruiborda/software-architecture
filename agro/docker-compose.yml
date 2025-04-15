@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - covid_data:/var/lib/postgresql/data
+      - agro_data:/var/lib/postgresql/data
       - ./data:/docker-entrypoint-initdb.d:ro
 
   api:
@@ -31,4 +31,4 @@ services:
 
 
 volumes:
-  covid_data:
+  agro_data:

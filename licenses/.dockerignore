@@ -1,0 +1,6 @@
+.idea
+target
+prompt_generator.py
+output.txt
+docker-compose.yml
+.gitignore

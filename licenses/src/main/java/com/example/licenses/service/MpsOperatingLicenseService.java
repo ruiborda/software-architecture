@@ -2,23 +2,21 @@ package com.example.licenses.service;
 
 import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
 import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.dto.GetMpsOperatingLicenseByIdResponseDTO;
 import com.example.licenses.mapper.MpsOperatingLicenseMapper;
 import com.example.licenses.model.MpsOperatingLicense;
 import com.example.licenses.repository.MpsOperatingLicenseRepository;
-// import lombok.AllArgsConstructor; // Elimina esta línea
-import lombok.RequiredArgsConstructor; // Añade esta línea
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-// @AllArgsConstructor // Reemplaza esta línea
-@RequiredArgsConstructor // Con esta línea
+@RequiredArgsConstructor
 public class MpsOperatingLicenseService {
 
-    // Estos campos final ahora serán inicializados por el constructor generado por @RequiredArgsConstructor
     final private MpsOperatingLicenseRepository repository;
     final private MpsOperatingLicenseMapper mapper;
 
@@ -26,6 +24,12 @@ public class MpsOperatingLicenseService {
         MpsOperatingLicense license = mapper.toEntity(requestDTO);
         MpsOperatingLicense savedLicense = repository.save(license);
         return mapper.toResponseDTO(savedLicense);
+    }
+
+    public GetMpsOperatingLicenseByIdResponseDTO getLicenseById(UUID id) {
+        return repository.findById(id)
+                .map(mapper::toGetByIdResponseDTO)
+                .orElseThrow(() -> new RuntimeException("License not found with id: " + id));
     }
 
     public List<MpsOperatingLicenseResponseDTO> getLicensesByDepartment(String department) {

@@ -2,27 +2,32 @@ package com.example.licenses.controller;
 
 import com.example.licenses.dto.MpsOperatingLicenseRequestDTO;
 import com.example.licenses.dto.MpsOperatingLicenseResponseDTO;
+import com.example.licenses.dto.GetMpsOperatingLicenseByIdResponseDTO;
 import com.example.licenses.service.MpsOperatingLicenseService;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/licenses")
+@RequiredArgsConstructor
 public class MpsOperatingLicenseController {
 
-    final private MpsOperatingLicenseService service;
-
-    public MpsOperatingLicenseController(MpsOperatingLicenseService service) {
-        this.service = service;
-    }
+    private final MpsOperatingLicenseService service;
 
     @PostMapping
     public ResponseEntity<MpsOperatingLicenseResponseDTO> createLicense(
             @RequestBody MpsOperatingLicenseRequestDTO requestDTO) {
         return ResponseEntity.ok(service.createLicense(requestDTO));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetMpsOperatingLicenseByIdResponseDTO> getLicenseById(
+            @PathVariable UUID id) {
+        return ResponseEntity.ok(service.getLicenseById(id));
     }
 
     @GetMapping("/department/{department}")
