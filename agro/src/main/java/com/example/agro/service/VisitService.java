@@ -1,5 +1,7 @@
 package com.example.agro.service;
 
+import com.example.agro.dto.VisitResponseDTO;
+import com.example.agro.mapper.VisitMapper;
 import com.example.agro.messaging.VisitMessageProducer;
 import com.example.agro.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +20,7 @@ public class VisitService {
 
     private final VisitRepository visitRepository;
     private final VisitMessageProducer visitMessageProducer;
+    private final VisitMapper visitMapper;
 
     /**
      * Records a visit for the company pagination feature.
@@ -30,5 +35,16 @@ public class VisitService {
         
         // Send message to queue with just the code
         visitMessageProducer.sendVisitCode(COMPANY_PAGINATION_CODE);
+    }
+    
+    /**
+     * Get all visits stored in the system.
+     * 
+     * @return List of visit DTOs
+     */
+    @Transactional(readOnly = true)
+    public List<VisitResponseDTO> getAllVisits() {
+        logger.info("Retrieving all visits");
+        return visitMapper.toResponseDTOList(visitRepository.findAll());
     }
 }
