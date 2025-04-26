@@ -28,23 +28,10 @@ public class VisitMessageConsumer {
 
     @RabbitListener(queues = "${rabbitmq.queue.notification.name}")
     @Transactional
-    public void consumeVisitNotification(NotificationDTO notification) {
-        logger.info("Received visit notification: {}", notification);
-        
-        // Process notification based on event type
-        switch (notification.getEventType()) {
-            case "VISIT_CODE":
-                processVisitCode(notification);
-                break;
-            case "VISIT_TRACKED":
-                processVisitTracked(notification);
-                break;
-            case "PAGINATION_ACCESSED":
-                processPaginationAccessed(notification);
-                break;
-            default:
-                logger.warn("Unknown notification event type: {}", notification.getEventType());
-        }
+    public void consumeVisitNotification(String visitCode) {
+        logger.info("Received visit notification: {}", visitCode);
+
+        processVisitCode(visitCode);
     }
     
     /**
@@ -52,10 +39,9 @@ public class VisitMessageConsumer {
      * This handles looking up the visit by code, creating it if it doesn't exist,
      * incrementing the counter, and saving it.
      */
-    private void processVisitCode(NotificationDTO notification) {
+    private void processVisitCode(String visitCode) {
         try {
-            // Extract the visit code from the notification data
-            String visitCode = (String) notification.getData();
+
             logger.info("Processing VISIT_CODE notification for code: {}", visitCode);
             
             // Look up the visit by code
@@ -83,22 +69,5 @@ public class VisitMessageConsumer {
         } catch (Exception e) {
             logger.error("Error processing VISIT_CODE notification: {}", e.getMessage(), e);
         }
-    }
-    
-    private void processVisitTracked(NotificationDTO notification) {
-        // In a real application, this might update analytics or send an email
-        logger.info("Processing VISIT_TRACKED notification: {}", notification.getMessage());
-        
-        // Could also store in a database for reporting
-        logger.info("Visit tracking data processed: {}", notification.getData());
-    }
-    
-    private void processPaginationAccessed(NotificationDTO notification) {
-        // Process pagination access event
-        logger.info("Processing PAGINATION_ACCESSED notification: {}", notification.getMessage());
-        logger.info("Pagination data: {}", notification.getData());
-        
-        // In a real application, this might update usage analytics
-        logger.info("Company pagination access recorded for analytics");
     }
 }

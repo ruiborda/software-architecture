@@ -39,20 +39,20 @@ public class VisitMessageProducer {
     /**
      * Publishes a visit notification to RabbitMQ
      */
-    public void publishVisitNotification(NotificationDTO notification) {
+    public void publishVisitNotification(String visitCode) {
         try {
             if (rabbitMQAvailable) {
-                logger.info("Sending visit notification to queue: {}", notification.getEventType());
-                rabbitTemplate.convertAndSend(exchange, routingKey, notification);
+                logger.info("Sending visit notification to queue: {}", visitCode);
+                rabbitTemplate.convertAndSend(exchange, routingKey, visitCode);
                 logger.info("Visit notification sent successfully to queue");
             } else {
                 // If RabbitMQ is not available, just log the notification
-                logger.info("RabbitMQ not available. Would have sent notification: {}", notification.getEventType());
-                logger.info("Notification message: {}", notification.getMessage());
+                logger.info("RabbitMQ not available. Would have sent notification: {}", visitCode);
+                logger.info("Notification message: {}", visitCode);
             }
         } catch (Exception e) {
             logger.error("Error sending visit notification: {}", e.getMessage(), e);
-            logger.info("Visit notification would have been sent: {}", notification.getMessage());
+            logger.info("Visit notification would have been sent: {}", visitCode);
         }
     }
 
@@ -61,29 +61,6 @@ public class VisitMessageProducer {
      * The consumer will handle looking up or creating the visit record.
      */
     public void sendVisitCode(String visitCode) {
-        NotificationDTO notification = NotificationDTO.builder()
-                .eventType("VISIT_CODE")
-                .message("Visit code: " + visitCode)
-                .entityType("VISIT_CODE")
-                .entityId(visitCode)
-                .data(visitCode)
-                .build();
-
-        publishVisitNotification(notification);
-    }
-
-    /**
-     * Tracks a visit by sending a notification to RabbitMQ
-     */
-    public void trackVisit(Visit visit) {
-        NotificationDTO notification = NotificationDTO.builder()
-                .eventType("VISIT_TRACKED")
-                .message("Visit tracking code: " + visit.getCode() + ", count: " + visit.getVisitCount())
-                .entityType("VISIT")
-                .entityId(visit.getId() != null ? visit.getId().toString() : "new")
-                .data(visit)
-                .build();
-
-        publishVisitNotification(notification);
+        publishVisitNotification(visitCode);
     }
 }
